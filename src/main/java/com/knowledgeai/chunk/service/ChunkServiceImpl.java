@@ -26,7 +26,7 @@ public class ChunkServiceImpl implements ChunkService {
 		Document document = documentRepository.findById(documentId)
 				.orElseThrow(() -> new RuntimeException("Document not found"));
 
-		List<String> chunks = TextChunkUtil.chunkText(document.getExtractedText(), 10);
+		List<String> chunks = TextChunkUtil.chunkText(document.getExtractedText(), 1000);
 
 		int chunkNo = 1;
 

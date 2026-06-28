@@ -5,34 +5,38 @@ import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.knowledgeai.rag.dto.RagResponse;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class RagServiceImpl implements RagService {
 
-	private final VectorStore vectorStore;
+	private final SearchService searchService;
 	private final ChatClient chatClient;
-	
-	@Autowired
-	SearchService searchService;
 
 	@Override
 	public RagResponse askQuestion(String question) {
 
 		List<Document> documents = searchService.search(question);
 
-		String context = documents.stream().map(Document::getText).collect(Collectors.joining("\n\n"));
+		if (documents == null || documents.isEmpty()) {
+			return RagResponse.builder().answer("I could not find any relevant information in the uploaded document.")
+					.chunksUsed(0).build();
+		}
+
+		String context = documents.stream().map(Document::getText) // or getContent() if needed
+				.collect(Collectors.joining("\n\n"));
 
 		String prompt = """
-				You are an AI assistant.
+				You are KnowledgeAI.
 
-				Answer ONLY using the context below.
+				Answer ONLY using the provided context.
 
-				If the answer is not present in the context, say:
+				If the answer is not present in the context, reply:
 				"I could not find that information in the uploaded document."
 
 				Context:
@@ -42,9 +46,9 @@ public class RagServiceImpl implements RagService {
 				%s
 				""".formatted(context, question);
 
-		String answer = chatClientBuilder.build().prompt(prompt).call().content();
+		String answer = chatClient.prompt().user(prompt).call().content();
 
 		return RagResponse.builder().answer(answer).build();
-	}
 
+	}
 }

@@ -9,4 +9,6 @@ public class RagResponse {
 
 	private String answer;
 
+	private Integer chunksUsed;
+
 }
