@@ -9,6 +9,6 @@ import org.springframework.stereotype.Service;
 @Service
 public interface SearchService {
 
-    List<Document> search(String question);
+    List<Document> search(String question, Long documentId);
 
 }

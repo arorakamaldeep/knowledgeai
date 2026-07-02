@@ -16,9 +16,10 @@ public class SearchServiceImpl implements SearchService {
 	private final VectorStore vectorStore;
 
 	@Override
-	public List<Document> search(String question) {
+	public List<Document> search(String question, Long documentId) {
 
-		SearchRequest request = SearchRequest.builder().query(question).topK(5).build();
+		SearchRequest request = SearchRequest.builder().query(question).topK(5)
+				.filterExpression("documentId == " + documentId).build();
 
 		return vectorStore.similaritySearch(request);
 	}

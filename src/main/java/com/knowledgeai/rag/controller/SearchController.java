@@ -22,7 +22,7 @@ public class SearchController {
 	private final SearchService searchService;
 
 	@GetMapping
-	public List<Document> search(@RequestParam String question) {
-		return searchService.search(question);
+	public List<Document> search(@RequestParam String question, @RequestParam Long documentId) {
+		return searchService.search(question, documentId);
 	}
 }

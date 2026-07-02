@@ -19,9 +19,9 @@ public class RagServiceImpl implements RagService {
 	private final ChatClient chatClient;
 
 	@Override
-	public RagResponse askQuestion(String question) {
+	public RagResponse askQuestion(String question, Long documentId) {
 
-		List<Document> documents = searchService.search(question);
+		List<Document> documents = searchService.search(question, documentId);
 
 		if (documents == null || documents.isEmpty()) {
 			return RagResponse.builder().answer("I could not find any relevant information in the uploaded document.")
@@ -32,23 +32,16 @@ public class RagServiceImpl implements RagService {
 				.collect(Collectors.joining("\n\n"));
 
 		String prompt = """
-				You are KnowledgeAI.
+				 Answer this question using the following context.
+				 Context:
+				 %s
+				 Question:
+				 %s
+        """.formatted(context, question);
 
-				Answer ONLY using the provided context.
+		String answer = chatClient.prompt().system(prompt).user(question).call().content();
 
-				If the answer is not present in the context, reply:
-				"I could not find that information in the uploaded document."
-
-				Context:
-				%s
-
-				Question:
-				%s
-				""".formatted(context, question);
-
-		String answer = chatClient.prompt().user(prompt).call().content();
-
-		return RagResponse.builder().answer(answer).build();
+		return RagResponse.builder().answer(answer).chunksUsed(documents.size()).build();
 
 	}
 }
