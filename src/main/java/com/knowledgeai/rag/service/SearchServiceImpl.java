@@ -8,7 +8,9 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SearchServiceImpl implements SearchService {
@@ -17,10 +19,9 @@ public class SearchServiceImpl implements SearchService {
 
 	@Override
 	public List<Document> search(String question, Long documentId) {
-
+		log.info("Searching document {} for '{}'", documentId, question);
 		SearchRequest request = SearchRequest.builder().query(question).topK(5)
 				.filterExpression("documentId == " + documentId).build();
-
 		return vectorStore.similaritySearch(request);
 	}
 }

@@ -11,7 +11,9 @@ import com.knowledgeai.chunk.entity.DocumentChunk;
 import com.knowledgeai.chunk.repository.DocumentChunkRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class VectorStoreServiceImpl implements VectorStoreService {
@@ -21,12 +23,13 @@ public class VectorStoreServiceImpl implements VectorStoreService {
 
 	@Override
 	public void storeDocumentChunks(Long documentId) {
-
+		
 		List<DocumentChunk> chunks = chunkRepository.findByDocumentId(documentId);
 
 		List<Document> documents = chunks.stream().map(chunk -> new Document(chunk.getContent(),
 				Map.of("documentId", chunk.getDocumentId(), "chunkNumber", chunk.getChunkNumber()))).toList();
-
+		log.info("Writing {} vectors into PGVector", documents.size());
 		vectorStore.add(documents);
+		log.info("Vector storage completed");
 	}
 }

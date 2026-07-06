@@ -12,6 +12,9 @@ import com.knowledgeai.document.entity.Document;
 import com.knowledgeai.document.repository.DocumentRepository;
 import com.knowledgeai.document.util.TextChunkUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class ChunkServiceImpl implements ChunkService {
 
@@ -23,10 +26,11 @@ public class ChunkServiceImpl implements ChunkService {
 
 	@Override
 	public ChunkResponse createChunks(Long documentId) {
+		log.info("Creating chunks...");
 		Document document = documentRepository.findById(documentId)
 				.orElseThrow(() -> new RuntimeException("Document not found"));
 
-		List<String> chunks = TextChunkUtil.chunkText(document.getExtractedText(), 1000);
+		List<String> chunks = TextChunkUtil.chunkText(document.getExtractedText(), 1800);
 
 		int chunkNo = 1;
 
@@ -37,7 +41,7 @@ public class ChunkServiceImpl implements ChunkService {
 
 			documentChunkRepository.save(chunk);
 		}
-
+		log.info("Generated {} chunks", chunks.size());
 		return ChunkResponse.builder().documentId(documentId).chunksCreated(chunks.size()).build();
 	}
 

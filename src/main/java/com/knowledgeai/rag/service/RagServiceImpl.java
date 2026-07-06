@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 import com.knowledgeai.rag.dto.RagResponse;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RagServiceImpl implements RagService {
@@ -22,6 +24,7 @@ public class RagServiceImpl implements RagService {
 	public RagResponse askQuestion(String question, Long documentId) {
 
 		List<Document> documents = searchService.search(question, documentId);
+		log.info("Generating answer using {} chunks", documents.size());
 
 		if (documents == null || documents.isEmpty()) {
 			return RagResponse.builder().answer("I could not find any relevant information in the uploaded document.")
@@ -32,12 +35,12 @@ public class RagServiceImpl implements RagService {
 				.collect(Collectors.joining("\n\n"));
 
 		String prompt = """
-				 Answer this question using the following context.
-				 Context:
-				 %s
-				 Question:
-				 %s
-        """.formatted(context, question);
+				Answer this question using the following context.
+				Context:
+				%s
+				Question:
+				%s
+				   """.formatted(context, question);
 
 		String answer = chatClient.prompt().system(prompt).user(question).call().content();
 
