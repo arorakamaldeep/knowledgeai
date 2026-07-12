@@ -9,4 +9,8 @@ import com.knowledgeai.chunk.entity.DocumentChunk;
 public interface DocumentChunkRepository extends JpaRepository<DocumentChunk, Long> {
 
 	List<DocumentChunk> findByDocumentId(Long documentId);
+	
+	List<DocumentChunk> findTop5ByDocumentIdAndContentContainingIgnoreCase(
+            Long documentId,
+            String keyword);
 }
