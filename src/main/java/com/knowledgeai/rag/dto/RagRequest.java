@@ -8,4 +8,6 @@ public class RagRequest {
 	private String question;
 
 	private Long documentId;
+	
+	private String conversationId;
 }

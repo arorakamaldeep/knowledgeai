@@ -21,7 +21,7 @@ public class RagController {
 	@PostMapping
 	public RagResponse ask(@RequestBody RagRequest request) {
 
-		return ragService.askQuestion(request.getQuestion(), request.getDocumentId());
+		return ragService.askQuestion(request.getQuestion(), request.getDocumentId(), request.getConversationId());
 
 	}
 }
